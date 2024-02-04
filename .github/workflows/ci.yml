@@ -1,0 +1,23 @@
+name: CI CHECKS
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python with version 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+      - name: Install dependencies
+        run: |
+          python3 -m pip3 install --upgrade pip
+          pip3 install -r requirements.txt
+      - name: Compile Code
+        run: |
+          python -m py_compile $(find . -name '*.py')
