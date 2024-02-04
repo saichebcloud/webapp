@@ -16,8 +16,8 @@ jobs:
           python-version: "3.8"
       - name: Install dependencies
         run: |
-          python3 -m pip3 install --upgrade pip
-          pip3 install -r requirements.txt
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
       - name: Compile Code
         run: |
           python -m py_compile $(find . -name '*.py')
