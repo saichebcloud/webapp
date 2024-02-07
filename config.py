@@ -8,6 +8,7 @@ load_dotenv()
 pymysql.install_as_MySQLdb()
 
 def configure_database(app):
+    
     db_user     = os.getenv("DB_USER")
     db_password = os.getenv("DB_PASSWORD")
     db_host     = os.getenv("DB_HOST")
