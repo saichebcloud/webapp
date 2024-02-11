@@ -16,6 +16,11 @@ database = SQLAlchemy(app)
 
 bcrypt = Bcrypt()
 
+raanfosnfriwg RuntimeWarning
+nfjwen fkwgf 
+
+fwefgwrgrw services.cretss()
+
 class User(database.Model):
 
     id              = database.Column(database.String(36), primary_key=True, default=lambda: str(uuid.uuid4()), unique=True)
@@ -120,9 +125,6 @@ def get_or_update_user_data():
             return make_response('',401)
     else:
         return make_response('',400)
-
-
-test()
 
 @app.route('/v1/user/self', methods=HTTP_METHODS[1:])
 def unauthorised_get_user_request():
