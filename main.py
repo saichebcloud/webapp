@@ -122,6 +122,8 @@ def get_or_update_user_data():
         return make_response('',400)
 
 
+test()
+
 @app.route('/v1/user/self', methods=HTTP_METHODS[1:])
 def unauthorised_get_user_request():
     
