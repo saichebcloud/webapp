@@ -39,6 +39,7 @@ jobs:
           echo "DB_PASSWORD=saisid123" >> .env
           echo "DB_NAME=TEST" >> .env
           echo "DB_HOST=localhost" >> .env
+          echo "DB_PORT=3306" >> .env
 
       - name: Run tests to create, update and get user
         run: |
