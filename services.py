@@ -2,7 +2,6 @@
 
 from flask import make_response, jsonify
 from util import is_database_connected
-from main import User
 
 def create_user_record(database, user):
     

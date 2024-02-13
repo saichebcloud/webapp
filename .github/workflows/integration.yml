@@ -1,0 +1,38 @@
+name: INTEGRATION TEST
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: INTEGRATION TEST
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python with version 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Install python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Set up MariaDB
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mariadb-client
+          sleep 10
+          sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'saisid123'; CREATE DATABASE TEST;"
+
+      - name: Create .env file
+        run: echo "DB_USER=root\nDB_PASSWORD=saisid123\nDB_NAME=TEST\nDB_HOST=localhost" > .env
+
+      - name: Run tests to create, update and get user
+        run: |
+          python -m pytest -s tests
