@@ -3,3 +3,4 @@ Flask-SQLAlchemy
 pymysql
 python-dotenv
 flask-bcrypt
+pytest
