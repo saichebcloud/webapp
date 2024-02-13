@@ -34,7 +34,11 @@ jobs:
           sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'saisid123'; CREATE DATABASE TEST;"
 
       - name: Create .env file
-        run: echo "DB_USER=root\nDB_PASSWORD=saisid123\nDB_NAME=TEST\nDB_HOST=localhost" > .env
+        run: |
+          echo "DB_USER=root" >> .env
+          echo "DB_PASSWORD=saisid123" >> .env
+          echo "DB_NAME=TEST" >> .env
+          echo "DB_HOST=localhost" >> .env
 
       - name: Run tests to create, update and get user
         run: |
