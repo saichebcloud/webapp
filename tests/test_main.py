@@ -20,6 +20,7 @@ def test_client():
 
 def test_create_update_get_user(test_client):
 
+    # create user
     user_data = {
         "first_name": "John",
         "last_name": "Doe",
@@ -35,6 +36,7 @@ def test_create_update_get_user(test_client):
 
     print("\nUser Created.")
 
+     # get user
     auth_token = f"{user_data['username']}:{user_data['password']}".encode('utf-8')
     base64_auth_token = b64encode(auth_token).decode('utf-8')
 
@@ -53,6 +55,7 @@ def test_create_update_get_user(test_client):
     assert responseJsonData['last_name'] == user_data['last_name']
     assert responseJsonData['username'] == user_data['username']
 
+    # modify user
     print("\nModifying user details - changing name to Sam")
 
     modified_data = {
@@ -63,6 +66,7 @@ def test_create_update_get_user(test_client):
 
     assert putResponse.status_code == 204
 
+    # get user
     print("\nMaking GET request to verify user details..")
 
     getResponse = test_client.get('/v1/user/self', headers=headers)

@@ -31,15 +31,15 @@ jobs:
 
       - name: Connect to MariaDB
         run: |
-          sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${{secrets.password}}'; CREATE DATABASE TEST;"
+          sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${{secrets.password}}'; CREATE DATABASE ${{secrets.name}};"
 
       - name: Create .env file
         run: |
           echo "DB_USER=${{secrets.user}}" >> .env
           echo "DB_PASSWORD=${{secrets.password}}" >> .env
           echo "DB_NAME=${{secrets.name}}" >> .env
-          echo "DB_HOST=${{secrets.host}}" >> .env
-          echo "DB_PORT=${{secrets.port}}" >> .env
+          echo "DB_HOST=localhost" >> .env
+          echo "DB_PORT=3306" >> .env
 
       - name: Run tests to create, update and get user
         run: |
