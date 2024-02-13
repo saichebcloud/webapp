@@ -26,8 +26,8 @@ jobs:
       - name: Set up MariaDB
         run: |
           sudo apt-get update
-          sudo apt-get install -y mariadb-client
-          sudo service mysql start
+          sudo apt-get install -y mariadb-server
+          sudo service mariadb start
 
       - name: Connect to MariaDB
         run: |
