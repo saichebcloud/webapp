@@ -53,6 +53,7 @@ Running this script will set up
    - pymysql
    - python-dotenv
    - flask-bcrypt
+   - pytest
 
 5. Once this is done, run this command to start the application
    ```sh
