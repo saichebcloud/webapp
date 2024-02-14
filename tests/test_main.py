@@ -2,12 +2,23 @@ from base64 import b64encode
 import json
 import pytest
 from main import app, database, User
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 @pytest.fixture
 def test_client():
 
+    db_user     = os.getenv("DB_USER")
+    db_password = os.getenv("DB_PASSWORD")
+    db_host     = os.getenv("DB_HOST")
+    db_port     = os.getenv("DB_PORT")
+    db_name     = os.getenv("DB_NAME")
+
     app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://root:saisid123@localhost:3306/TEST'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
+
     client = app.test_client()
 
     with app.app_context():
@@ -36,8 +47,10 @@ def test_create_update_get_user(test_client):
 
     print("\nUser Created.")
 
-     # get user
-    auth_token = f"{user_data['username']}:{user_data['password']}".encode('utf-8')
+
+
+    # get user
+    auth_token        = f"{user_data['username']}:{user_data['password']}".encode('utf-8')
     base64_auth_token = b64encode(auth_token).decode('utf-8')
 
     headers = {'Authorization': f'Basic {base64_auth_token}'}
@@ -45,6 +58,7 @@ def test_create_update_get_user(test_client):
     print("\nMaking GET request to verify user details..")
 
     getResponse = test_client.get('/v1/user/self', headers=headers)
+
     assert getResponse.status_code == 200
 
     print(f"\nResponse Received...{getResponse.json}")
@@ -52,8 +66,9 @@ def test_create_update_get_user(test_client):
     responseJsonData = getResponse.json
 
     assert responseJsonData['first_name'] == user_data['first_name']
-    assert responseJsonData['last_name'] == user_data['last_name']
-    assert responseJsonData['username'] == user_data['username']
+    assert responseJsonData['last_name']  == user_data['last_name']
+    assert responseJsonData['username']   == user_data['username']
+
 
     # modify user
     print("\nModifying user details - changing name to Sam")
@@ -66,10 +81,12 @@ def test_create_update_get_user(test_client):
 
     assert putResponse.status_code == 204
 
+
     # get user
     print("\nMaking GET request to verify user details..")
 
     getResponse = test_client.get('/v1/user/self', headers=headers)
+
     assert getResponse.status_code == 200
 
     print(f"\nResponse Received...{getResponse.json}")
@@ -77,7 +94,7 @@ def test_create_update_get_user(test_client):
     responseJsonData = getResponse.json
 
     assert responseJsonData['first_name'] == modified_data['first_name']
-    assert responseJsonData['last_name'] == user_data['last_name']
-    assert responseJsonData['username'] == user_data['username']
+    assert responseJsonData['last_name']  == user_data['last_name']
+    assert responseJsonData['username']   == user_data['username']
 
     print("\n Finished Testing")
