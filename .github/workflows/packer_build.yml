@@ -58,5 +58,5 @@ jobs:
         working-directory: ./packer
 
       - name: Build packer image
-        run: packer build . -var "archive_path=../Archive.zip"
+        run: packer build -var "archive_path=../Archive.zip" .
         working-directory: ./packer
