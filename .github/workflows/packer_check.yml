@@ -1,0 +1,30 @@
+name: Packer check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: PACKER CHECKS
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Packer init
+        run: packer init .
+        working-directory: ./packer
+
+      - name: Packer format check
+        run: |
+          packer fmt . | grep ""
+          if [ $? -eq 0 ]; then exit 1; fi
+        working-directory: ./packer
+
+      - name: Packer validate check
+        run: |
+          packer validate .
+          if [ $? -eq 0 ]; then exit 1; fi
+        working-directory: ./packer

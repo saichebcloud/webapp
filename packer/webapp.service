@@ -1,0 +1,12 @@
+[UNIT]
+Description=Python Webapp Application
+After=mariadb.service
+Requires=mariadb.service
+
+[Service]
+ExecStart=/usr/bin/python3 /home/csye6225/main.py
+Restart=always
+WorkingDirectory=/home/csye6225/
+
+[Install]
+WantedBy=multi-user.target
