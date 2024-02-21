@@ -6,7 +6,7 @@ build {
   }
 
   provisioner "file" {
-    source      = "../Archive.zip"
+    source      = var.archive_path
     destination = "/tmp/Archive.zip"
   }
 
