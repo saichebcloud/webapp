@@ -19,7 +19,7 @@ jobs:
 
       - name: Packer format check
         run: |
-          packer fmt . | grep ""
+          packer fmt . | grep ".hcl"
           if [ $? -eq 0 ]; then exit 1; fi
         working-directory: ./packer
 
