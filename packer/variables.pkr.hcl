@@ -22,3 +22,8 @@ variable username {
   type    = string
   default = "centos"
 }
+
+variable archive_path {
+  type    = string
+  default = ""
+}
