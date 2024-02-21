@@ -51,7 +51,7 @@ jobs:
           credentials_json: "${{ secrets.GCP_CREDENTIALS }}"
 
       - name: ZIP python code
-        run: zip -r Archive.zip --exclude '__pycache__' config.py main.py services.py util.py requirements.txt tests
+        run: zip Archive.zip config.py main.py services.py util.py requirements.txt tests/test_main.py
 
       - name: Packer init
         run: packer init .
