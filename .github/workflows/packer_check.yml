@@ -17,14 +17,19 @@ jobs:
         run: packer init .
         working-directory: ./packer
 
-      - name: Packer format check
+      - name: Packer Format Check
         run: |
-          packer fmt . | grep ".hcl"
-          if [ $? -eq 0 ]; then exit 1; fi
+          for template in $(find . -name '*.hcl'); do
+             packer fmt "$template"
+             if ! git diff --exit-code "$template"; then
+               echo "Packer template $template is not correctly formatted."
+               exit 1
+             fi
+           done
         working-directory: ./packer
 
-      - name: Packer validate check
+      - name: Packer Validate
         run: |
           packer validate .
-          if [ $? -eq 0 ]; then exit 1; fi
+          if [ $? -ne 0 ]; then exit 1; fi
         working-directory: ./packer
