@@ -1,0 +1,62 @@
+name: PACKER BUILD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: PACKER BUILD
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python with version 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Install python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Set up MariaDB
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mariadb-server
+          sudo service mariadb start
+
+      - name: Connect to MariaDB
+        run: |
+          sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${{secrets.password}}'; CREATE DATABASE ${{secrets.name}};"
+
+      - name: Create .env file
+        run: |
+          echo "DB_USER=${{secrets.user}}" >> .env
+          echo "DB_PASSWORD=${{secrets.password}}" >> .env
+          echo "DB_NAME=${{secrets.name}}" >> .env
+          echo "DB_HOST=localhost" >> .env
+          echo "DB_PORT=3306" >> .env
+
+      - name: Run tests to create, update and get user
+        run: |
+          python -m pytest -s tests
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v2"
+        with:
+          credentials_json: "${{ secrets.GCP_CREDENTIALS }}"
+
+      - name: ZIP python code
+        run: zip -r Archive.zip config.py main.py services.py util.py requirements.txt tests
+
+      - name: Packer init
+        run: packer init
+        working-directory: ./packer
+
+      - name: Build packer image
+        run: packer build . -var "archive_path=../Archive.zip"
+        working-directory: ./packer
