@@ -1,7 +1,7 @@
 build {
   sources = ["sources.googlecompute.my-img"]
 
-  provisioner "shell" {
+  provisioner "shell"
     script = "./scripts/user.sh"
   }
 
