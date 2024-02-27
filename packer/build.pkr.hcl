@@ -24,14 +24,6 @@ build {
   }
 
   provisioner "shell" {
-    script = "./scripts/config_mariadb.sh"
-  }
-
-  provisioner "shell" {
-    script = "./scripts/populate_env.sh"
-  }
-
-  provisioner "shell" {
     script = "./scripts/move_code.sh"
   }
 
