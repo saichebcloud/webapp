@@ -24,6 +24,14 @@ build {
   }
 
   provisioner "shell" {
+    script = "./scripts/install_ops_agent.sh"
+  }
+
+  provisioner "shell" {
+    script = "./scripts/generate_ops_agent_config_file.sh"
+  }
+
+  provisioner "shell" {
     script = "./scripts/move_code.sh"
   }
 
