@@ -1,7 +1,8 @@
+#!/bin/bash
 
 filename="/etc/google-cloud-ops-agent/config.yaml"
 
-content <<EOF
+content=$(cat <<EOF
 # Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +25,6 @@ logging:
   receivers:
     webapp:
       type: files
-
       include_paths:
       - /var/log/webapp.log
       record_log_file_path: true
@@ -45,7 +45,8 @@ logging:
         processors: [webapp-processor,modify-fields]
 
 EOF
+)
 
-sudo echo "$content" > "$filename"
+echo "$content" | sudo tee "$filename" > /dev/null
 
 echo "File '$filename' created successfully!"
