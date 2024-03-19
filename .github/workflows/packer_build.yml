@@ -43,7 +43,7 @@ jobs:
 
       - name: Run tests to create, update and get user
         run: |
-          sudo python -m pytest -s tests
+          python -m pytest -s tests
 
       - id: "auth"
         uses: "google-github-actions/auth@v2"
