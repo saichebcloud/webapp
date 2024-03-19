@@ -7,6 +7,7 @@ from datetime import datetime
 import uuid
 import services
 import util
+import log_module
 
 HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'TRACE', 'PATCH', 'HEAD', 'OPTIONS']
 
@@ -15,6 +16,8 @@ configure_database(app)
 database = SQLAlchemy(app)
 
 bcrypt = Bcrypt()
+
+log_module.log(log_level='INFO',log_message='Server Starting up')
 
 class User(database.Model):
 
