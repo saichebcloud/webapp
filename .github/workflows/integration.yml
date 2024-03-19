@@ -43,4 +43,4 @@ jobs:
 
       - name: Run tests to create, update and get user
         run: |
-          python -m pytest -s tests
+          sudo python -m pytest -s tests
