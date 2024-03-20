@@ -5,7 +5,7 @@ import os
 WEBAPP_LOG_FILE = '/tmp/webapp.log'
 
 if os.path.exists('/var/log/webapp.log'):
-    WEBAPP_LOG_FILE = '/tmp/webapp.log'
+    WEBAPP_LOG_FILE = '/var/log/webapp.log'
 
 def write_to_log(jsonObject):
     
