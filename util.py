@@ -3,6 +3,7 @@
 from sqlalchemy.exc import OperationalError
 import re
 import base64
+import log_module
 
 def is_database_connected(database):
     
@@ -68,6 +69,7 @@ def parse_and_validate_create_user_request(request):
     for field in requestBody.keys():
         
         if field not in allowed_fields:
+            log_module.log(log_level='WARNING',log_message=f'Unexpected field {field} received')
             return False
 
     user_first_name = requestBody.get('first_name')
@@ -76,6 +78,7 @@ def parse_and_validate_create_user_request(request):
     user_username   = requestBody.get('username')
 
     if not user_first_name or not validate_name(user_first_name) or not user_last_name or not validate_name(user_last_name) or not user_password or not user_username or not validate_email(user_username):
+        log_module.log(log_level='WARNING',log_message='Invalid format passed for field')
         return False
     
     else:
@@ -102,6 +105,7 @@ def parse_and_validate_update_user_request(request):
     for field in requestBody.keys():
         
         if field not in allowed_updation_fields:
+            log_module.log(log_level='WARNING',log_message=f'Unexpected field {field} received')
             return False
         
         else: 
@@ -121,9 +125,11 @@ def parse_user_credentials(request):
         username, password  = credentials.split(':')
         
         if username == '' or password == '':
+            log_module.log(log_level='WARNING',log_message='Password or username invalid')
             return []
         
         return [username,password]
     
     else:
+        log_module.log(log_level='WARNING',log_message='Unexpected authorisation header passed')
         return []
