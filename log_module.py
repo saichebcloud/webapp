@@ -19,7 +19,7 @@ def log(log_level, log_message):
 
     now = datetime.datetime.now()
     log_entry = {
-        "timeStamp": str(datetime.datetime.now(datetime.timezone.utc)),
+        "timeStamp": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f%Z"),
         "severity" : log_level,
         "message" : log_message
     }
