@@ -52,7 +52,10 @@ class User(database.Model):
 @app.route('/v1/user', methods=[HTTP_METHODS[1]])
 def create_new_user():
 
+    log_module.log(log_level='INFO',log_message='Received request to create user')
+
     if util.check_request_sent_with_payload(request,auth=True,params=True):
+        log_module.log(log_level='WARNING',log_message='Request sent with unexpected payload')
         return make_response('',400)
 
     if request.is_json:
@@ -72,7 +75,10 @@ def create_new_user():
 
             new_user = User(first_name=user_details['user_first_name'], last_name=user_details['user_last_name'], username=user_details['user_username'] , password=user_details['user_password'] )
             return services.create_user_record(database=database, user=new_user)
+        
+        log_module.log(log_level='WARNING',log_message='Attempt to create user with existing username')
 
+    log_module.log(log_level='WARNING',log_message='Request payload is incorrect')
     return make_response('',400)
 
 
@@ -85,10 +91,14 @@ def unauthorised_create_user_request():
 @app.route('/v1/user/self', methods=[HTTP_METHODS[0],HTTP_METHODS[2]], provide_automatic_options=False)
 def get_or_update_user_data():
 
+    log_module.log(log_level='INFO',log_message='Received request to get/update user')
+
     if request.method == HTTP_METHODS[2] and util.check_request_sent_with_payload(request, params=True):
+        log_module.log(log_level='WARNING',log_message='Request sent with unexpected payload')
         return make_response('',400)
     
     if request.method == HTTP_METHODS[0] and util.check_request_sent_with_payload(request, params=True, body=True):
+        log_module.log(log_level='WARNING',log_message='Request sent with unexpected payload')
         return make_response('', 400)
 
     if util.check_for_head_method_mapping(request):
@@ -133,11 +143,15 @@ def unauthorised_get_user_request():
 
 @app.route('/healthz', methods=[HTTP_METHODS[0]], provide_automatic_options=False)
 def health_check():
+
+    log_module.log(log_level='INFO',log_message='Received request for database health')
+
     
     if util.check_for_head_method_mapping(request):
         return services.handle_unauthorised_methods()
 
     if util.check_request_sent_with_payload(request, body=True, params=True, auth=True):
+        log_module.log(log_level='WARNING',log_message='Request sent with unexpected payload')
         return make_response('',400)
 
     return services.check_database_health(database)
@@ -165,9 +179,11 @@ def is_user_authenticated(credentials):
         if user.check_password(password):
             return user
         else:
+            log_module.log(log_level='WARNING',log_message='Could not authenticate user')
             return False
     
     else:
+        log_module.log(log_level='WARNING',log_message='Could not recognize username')
         return False
 
 
