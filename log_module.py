@@ -18,7 +18,7 @@ def write_to_log(jsonObject):
 def log(log_level, log_message):
 
     log_entry = {
-        "timeStamp": str(datetime.datetime.now()),
+        "timeStamp": str(datetime.datetime.now(datetime.timezone.utc)),
         "severity" : log_level,
         "message" : log_message
     }
