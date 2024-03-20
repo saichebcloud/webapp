@@ -32,7 +32,7 @@ logging:
   processors:
     webapp-processor:
       type: parse_json
-      time_key: time
+      time_key: timeStamp
       time_format: "%Y-%m-%dT%H:%M:%S.%L%Z"
     modify-fields:
       type: modify_fields
