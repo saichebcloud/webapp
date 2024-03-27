@@ -19,6 +19,27 @@ bcrypt = Bcrypt()
 
 log_module.log(log_level='INFO',log_message='Server Starting up')
 
+class Token(database.Model):
+
+    token     = database.Column(database.String(20),primary_key=True)
+    email     = database.Column(database.String(50))
+    timestamp = database.Column(database.DateTime, default=datetime.utcnow)
+    status    = database.Column(database.String(15))
+
+    def __init__(self,token,status,email):
+        self.email = email
+        self.token = token
+        self.status = status
+    
+    def get_token_info(self):
+        return {
+            'token': self.token,
+            'email': self.email,
+            'timestamp': self.timestamp,
+            'status': self.status
+        }
+
+
 class User(database.Model):
 
     log_module.log(log_level='INFO',log_message='Received request to create user')
@@ -74,7 +95,10 @@ def create_new_user():
         if user_details and User.query.filter_by(username=user_details['user_username']).first() is None:
 
             new_user = User(first_name=user_details['user_first_name'], last_name=user_details['user_last_name'], username=user_details['user_username'] , password=user_details['user_password'] )
-            return services.create_user_record(database=database, user=new_user)
+            token = services.generate_unique_token()
+            new_token = Token(email=user_details['user_username'],token=token,status="PENDING")
+            print(new_token.get_token_info())
+            return services.create_user_record(database=database, user=new_user, token=new_token)
         
         log_module.log(log_level='WARNING',log_message='Attempt to create user with existing username')
     
