@@ -48,7 +48,7 @@ jobs:
       - id: "auth"
         uses: "google-github-actions/auth@v2"
         with:
-          credentials_json: "${{ secrets.GCP_CREDENTIALS }}"
+          credentials_json: "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}"
 
       - name: ZIP python code
         run: zip Archive.zip config.py main.py services.py util.py requirements.txt log_module.py tests/test_main.py
