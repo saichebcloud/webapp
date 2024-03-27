@@ -3,14 +3,42 @@
 from flask import make_response, jsonify
 from util import is_database_connected
 import log_module
+from google.cloud import pubsub_v1
+import json
+import secrets
+import string
 
-def create_user_record(database, user):
+project_id = "devp-414719"
+topic_id   = "verify_user"
+publisher  = pubsub_v1.PublisherClient()
+topic_path = publisher.topic_path(project_id, topic_id)
+
+
+def generate_unique_token(length=16):
+    alphabet = string.ascii_letters + string.digits
+    token = ''.join(secrets.choice(alphabet) for _ in range(length))
+    return token
+
+def create_user_record(database, user, token):
     
     database.session.add(user)
     database.session.commit()
     database.session.refresh(user)
     user_details = user.get_user()
+    token_details = token.get_token_info()
     log_module.log(log_level='INFO', log_message=f'User {user_details["username"]} created succesfully')
+
+    data = {
+        "email": user_details.get('username'),
+        "token": token_details.get('token')
+    }
+
+    json_data = json.dumps(data)
+
+    database.session.add(token)
+    database.session.commit()
+    publisher.publish(topic_path,json_data.encode("utf-8"))
+
     return jsonify(user_details), 201
 
 
