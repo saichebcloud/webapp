@@ -41,6 +41,11 @@ jobs:
           echo "DB_HOST=localhost" >> .env
           echo "DB_PORT=3306" >> .env
 
+      - id: "auth"
+        uses: "google-github-actions/auth@v2"
+        with:
+          credentials_json: "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}"
+
       - name: Run tests to create, update and get user
         run: |
           python -m pytest -s tests
