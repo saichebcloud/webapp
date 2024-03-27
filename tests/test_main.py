@@ -1,7 +1,7 @@
 from base64 import b64encode
 import json
 import pytest
-from main import app, database, User
+from main import app, database, User, Token
 import os
 from dotenv import load_dotenv
 
@@ -46,6 +46,11 @@ def test_create_update_get_user(test_client):
     assert postResponse.status_code == 201
 
     print("\nUser Created.")
+    
+    with app.app_context():
+        token_record = Token.query.filter_by(email=user_data['username']).first()
+        token_record.status = "VERIFIED"
+        database.session.commit()
 
 
 
