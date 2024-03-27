@@ -71,14 +71,14 @@ class User(database.Model):
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password, password)
 
-@app.route('/verify',methods=[HTTP_METHODS[1]])
+@app.route('/verify',methods=[HTTP_METHODS[0]])
 def verify_user():
 
-    if util.check_request_sent_with_payload(request,auth=True,params=True):
+    if util.check_request_sent_with_payload(request,auth=True,body=True):
         log_module.log(log_level='WARNING',log_message='Request sent with unexpected payload')
         return make_response('',400)
 
-    token = request.form.get('token')
+    token = request.args.get('token')
 
     token_record = Token.query.filter_by(token=token).first()
 
@@ -108,7 +108,7 @@ def verify_user():
     return make_response('Link expired',410)
 
 
-@app.route('/verify', methods=HTTP_METHODS[2:].append(HTTP_METHODS[0]))
+@app.route('/verify', methods=HTTP_METHODS[1:])
 def unauthorised_verify_user():
 
     return services.handle_unauthorised_methods()
@@ -251,7 +251,7 @@ def is_user_authenticated(credentials):
             return False
     
     else:
-        log_module.log(log_level='WARNING',log_message='Could not recognize username or username not verified')
+        log_module.log(log_level='ERROR',log_message='Could not recognize username or username not verified')
         return False
 
 
