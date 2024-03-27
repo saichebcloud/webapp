@@ -240,9 +240,10 @@ def is_user_authenticated(credentials):
     
     username,password = credentials
     
-    user = User.query.filter_by(username=username).first()
+    user  = User.query.filter_by(username=username).first()
+    token = Token.query.filter_by(email=username,status='VERIFIED').first()
     
-    if user:
+    if user and token:
         if user.check_password(password):
             return user
         else:
@@ -250,7 +251,7 @@ def is_user_authenticated(credentials):
             return False
     
     else:
-        log_module.log(log_level='WARNING',log_message='Could not recognize username')
+        log_module.log(log_level='WARNING',log_message='Could not recognize username or username not verified')
         return False
 
 
