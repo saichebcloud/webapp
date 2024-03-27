@@ -71,6 +71,48 @@ class User(database.Model):
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password, password)
 
+@app.route('/verify',methods=[HTTP_METHODS[1]])
+def verify_user():
+
+    if util.check_request_sent_with_payload(request,auth=True,params=True):
+        log_module.log(log_level='WARNING',log_message='Request sent with unexpected payload')
+        return make_response('',400)
+
+    token = request.form.get('token')
+
+    token_record = Token.query.filter_by(token=token).first()
+
+    if not token_record:
+        return make_response('Invalid Token',400)
+
+    token_details = token_record.get_token_info()
+    time = str(token_details.get('timestamp'))
+    timestamp_format = "%Y-%m-%d %H:%M:%S"
+
+
+    timestamp = datetime.strptime(time, timestamp_format)
+    current_time = datetime.utcnow()
+
+# Calculate time difference
+    time_difference = current_time - timestamp
+
+# Convert time difference to minutes
+    minutes_difference = time_difference.total_seconds() / 60
+
+
+    if minutes_difference < 2:
+        token_record.status = 'VERIFIED'
+        database.session.commit()
+        return make_response('verfied',200)
+
+    return make_response('Link expired',410)
+
+
+@app.route('/verify', methods=HTTP_METHODS[2:].append(HTTP_METHODS[0]))
+def unauthorised_verify_user():
+
+    return services.handle_unauthorised_methods()
+
 
 @app.route('/v1/user', methods=[HTTP_METHODS[1]])
 def create_new_user():
