@@ -72,7 +72,7 @@ jobs:
           image=(cat image.txt)
           TEMPLATE_NAME="new-template-$(date +%s)"
           echo "TEMPLATE_NAME=$TEMPLATE_NAME" >> $GITHUB_ENV
-          gcloud compute instance-templates create my-instance-template \               
+          gcloud compute instance-templates create $TEMPLATE_NAME \               
             --source-instance=$instance_name \           
             --source-instance-zone=$zone \   
             --instance-template-region=us-west1 \      
@@ -94,7 +94,7 @@ jobs:
           REGION="us-west1"
           gcloud compute instance-groups managed rolling-action start-update $INSTANCE_GROUP_MANAGER \
           --version=template=$TEMPLATE_NAME \
-          --region=REGION
+          --region=$REGION
         working-directory: ./packer
 
       - name: Check update status
