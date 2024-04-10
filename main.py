@@ -17,7 +17,7 @@ database = SQLAlchemy(app)
 
 bcrypt = Bcrypt()
 
-log_module.log(log_level='INFO',log_message='Server Starting up')
+log_module.log(log_level='DEBUG',log_message='Server Starting up')
 
 class Token(database.Model):
 
@@ -183,6 +183,11 @@ def get_or_update_user_data():
             return db_response
 
         user = is_user_authenticated(user_credentials)
+
+        token = Token.query.filter_by(email=user_credentials[0],status='VERIFIED').first()
+
+        if user and not token:
+            return make_response('',403)
         
         if user and request.method == HTTP_METHODS[0]:
             log_module.log(log_level='INFO',log_message='GET user request received, returning user details')
@@ -241,9 +246,8 @@ def is_user_authenticated(credentials):
     username,password = credentials
     
     user  = User.query.filter_by(username=username).first()
-    token = Token.query.filter_by(email=username,status='VERIFIED').first()
     
-    if user and token:
+    if user:
         if user.check_password(password):
             return user
         else:
