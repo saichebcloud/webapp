@@ -95,7 +95,7 @@ jobs:
           INSTANCE_GROUP_MANAGER="webapp-instance-manager"
           REGION="us-west1"
           gcloud compute instance-groups managed rolling-action start-update $INSTANCE_GROUP_MANAGER \
-          --version template=$TEMPLATE_NAME \
+          --version template=projects/devp-414719/regions/us-west1/instanceTemplates/$TEMPLATE_NAME \
           --region=$REGION
         working-directory: ./packer
 
