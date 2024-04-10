@@ -7,6 +7,7 @@ from google.cloud import pubsub_v1
 import json
 import secrets
 import string
+from concurrent.futures import Future
 
 project_id = "devp-414719"
 topic_id   = "verify_user"
@@ -37,7 +38,10 @@ def create_user_record(database, user, token):
 
     database.session.add(token)
     database.session.commit()
-    publisher.publish(topic_path,json_data.encode("utf-8"))
+    future: Future = publisher.publish(topic_path, json_data.encode("utf-8"))
+
+    if future.result():
+      print("Message published successfully!")
 
     return jsonify(user_details), 201
 
