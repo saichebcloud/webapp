@@ -67,7 +67,7 @@ jobs:
 
       - name: Create a new instance template
         run: |
-          gcloud config set project devp-414719
+          gcloud config set project ${{secrets.PROJECT}}
           output=$(gcloud compute instances list --format="table(name,zone)" | tail -n 1)
           instance_name=$(echo "$output" | awk '{print $1}')
           zone=$(echo "$output" | awk '{print $2}')
@@ -77,32 +77,32 @@ jobs:
           gcloud compute instance-templates create $TEMPLATE_NAME \
             --source-instance=$instance_name \
             --source-instance-zone=$zone \
-            --instance-template-region=us-west1 \
-            --configure-disk=device-name=persistent-disk-0,instantiate-from=custom-image,custom-image=projects/devp-414719/global/images/$image
+            --instance-template-region=${{secrets.REGION}} \
+            --configure-disk=device-name=persistent-disk-0,instantiate-from=custom-image,custom-image=projects/${{secrets.PROJECT}}/global/images/$image
         working-directory: ./packer
 
       - name: Set instance template for instance group
         run: |
-          INSTANCE_GROUP_MANAGER="webapp-instance-manager"
-          REGION="us-west1"
+          INSTANCE_GROUP_MANAGER=${{secrets.INSTANCE_GROUP}}
+          REGION=${{secrets.REGION}}
           gcloud compute instance-groups managed set-instance-template $INSTANCE_GROUP_MANAGER \
-            --template=projects/devp-414719/regions/us-west1/instanceTemplates/$TEMPLATE_NAME \
+            --template=projects/${{secrets.PROJECT}}/regions/${{secrets.REGION}}/instanceTemplates/$TEMPLATE_NAME \
             --region=$REGION
         working-directory: ./packer
 
       - name: Rolling-action start update
         run: |
-          INSTANCE_GROUP_MANAGER="webapp-instance-manager"
-          REGION="us-west1"
+          INSTANCE_GROUP_MANAGER=${{secrets.INSTANCE_GROUP}}
+          REGION=${{secrets.REGION}}
           gcloud compute instance-groups managed rolling-action start-update $INSTANCE_GROUP_MANAGER \
-          --version template=projects/devp-414719/regions/us-west1/instanceTemplates/$TEMPLATE_NAME \
+          --version template=projects/${{secrets.PROJECT}}/regions/$REGION/instanceTemplates/$TEMPLATE_NAME \
           --region=$REGION
         working-directory: ./packer
 
       - name: Check update status
         run: |
-          INSTANCE_GROUP_MANAGER="webapp-instance-manager"
-          REGION="us-west1"
+          INSTANCE_GROUP_MANAGER=${{secrets.INSTANCE_GROUP}}
+          REGION=${{secrets.REGION}}
           while true; do
             STATUS=$(gcloud compute instance-groups managed describe $INSTANCE_GROUP_MANAGER \
                       --region=$REGION \
