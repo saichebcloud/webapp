@@ -74,11 +74,7 @@ jobs:
           image=$(cat image.txt)
           TEMPLATE_NAME="new-template-$(date +%s)"
           echo "TEMPLATE_NAME=$TEMPLATE_NAME" >> $GITHUB_ENV
-          gcloud compute instance-templates create $TEMPLATE_NAME \
-            --source-instance=$instance_name \
-            --source-instance-zone=$zone \
-            --instance-template-region=us-west1 \
-            --configure-disk=device-name=persistent-disk-0,instantiate-from=custom-image,custom-image=projects/devp-414719/global/images/$image
+          gcloud beta compute instance-templates create $TEMPLATE_NAME --project=devp-414719 --machine-type=e2-medium --network-interface=network-tier=PREMIUM,subnet=webapp --instance-template-region=projects/devp-414719/regions/us-west1 --metadata=DB_HOST=10.124.0.5,DB_NAME=csye,DB_PASSWORD=OG0H5qIG6x,DB_USER=saicheb,startup-script=$'\n'\#\!/bin/bash$'\n'$'\n'echo\ \"DB_NAME=csye\"\ \>\ /tmp/.env$'\n'echo\ \"DB_HOST=10.124.0.5\"\ \>\>\ /tmp/.env$'\n'echo\ \"DB_PORT=3306\"\ \>\>\ /tmp/.env$'\n'echo\ \"DB_USER=saicheb\"\ \>\>\ /tmp/.env$'\n'echo\ \"DB_PASSWORD=OG0H5qIG6x\"\ \>\>\ /tmp/.env$'\n'$'\n'cp\ /tmp/.env\ /home/csye6225/.env$'\n'$'\n' --maintenance-policy=MIGRATE --provisioning-model=STANDARD --service-account=webapp-sa-2592@devp-414719.iam.gserviceaccount.com --scopes=https://www.googleapis.com/auth/cloud-platform --region=us-west1 --tags=webapp,allow-health-check --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=projects/devp-414719/global/images/$image,kms-key=projects/devp-414719/locations/us-west1/keyRings/key_ring/cryptoKeys/vm-crypto-key,mode=rw,size=20,type=pd-standard --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --reservation-affinity=any
         working-directory: ./packer
 
       - name: Set instance template for instance group
