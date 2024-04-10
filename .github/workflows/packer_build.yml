@@ -58,5 +58,73 @@ jobs:
         working-directory: ./packer
 
       - name: Build packer image
-        run: packer build -var "archive_path=../Archive.zip" .
+        run: packer build -var "archive_path=../Archive.zip" . | tee output.txt
+        working-directory: ./packer
+
+      - name: Extract Image Name
+        run: cat output.txt | grep 'A disk image was created' | awk '{print $NF}' > image.txt
+        working-directory: ./packer
+
+      - name: Create a new instance template
+        run: |
+          gcloud config set project devp-414719
+          output=$(gcloud compute instances list --format="table(name,zone)" | tail -n 1);instance_name=$(echo "$output" | awk '{print $1}');zone=$(echo "$output" | awk '{print $2}');
+          image=(cat image.txt)
+          TEMPLATE_NAME="new-template-$(date +%s)"
+          echo "TEMPLATE_NAME=$TEMPLATE_NAME" >> $GITHUB_ENV
+          gcloud compute instance-templates create my-instance-template \               
+            --source-instance=$instance_name \           
+            --source-instance-zone=$zone \   
+            --instance-template-region=us-west1 \      
+            --configure-disk=device-name=persistent-disk-0,instantiate-from=custom-image,custom-image=projects/devp-414719/global/images/$image
+        working-directory: ./packer
+
+      - name: Set instance template for instance group
+        run: |
+          INSTANCE_GROUP_MANAGER="webapp-instance-manager"
+          REGION="us-west1"
+          gcloud compute instance-groups managed set-instance-template $INSTANCE_GROUP_MANAGER \
+            --template=projects/devp-414719/regions/us-west1/instanceTemplates/$TEMPLATE_NAME \
+            --region=$REGION
+        working-directory: ./packer
+
+      - name: Rolling-action start update
+        run: |
+          INSTANCE_GROUP_MANAGER="webapp-instance-manager"
+          REGION="us-west1"
+          gcloud compute instance-groups managed rolling-action start-update $INSTANCE_GROUP_MANAGER \
+          --version=template=$TEMPLATE_NAME \
+          --region=REGION
+        working-directory: ./packer
+
+      - name: Check update status
+        run: |
+          INSTANCE_GROUP_MANAGER="webapp-instance-manager"
+          REGION="us-west1"
+          while true; do
+            STATUS=$(gcloud compute instance-groups managed describe $INSTANCE_GROUP_MANAGER \
+                      --region=$REGION \
+                      --format="value(status.isStable)")
+
+            ERRORS=$(gcloud compute instance-groups managed list-errors $INSTANCE_GROUP_MANAGER \
+                      --region=$REGION \
+                      --format="value(error.errors[].message)")
+
+            if [ "$STATUS" == "True" ]; then
+              echo "Rolling update completed successfully."
+              break
+            elif [ -n "$ERRORS" ]; then
+              echo "Errors detected during rolling update: $ERRORS"
+              UPDATE_FAILED=true
+              break
+            else
+              echo "Waiting for rolling update to complete..."
+              sleep 30
+            fi
+          done
+
+          if [ "$UPDATE_FAILED" = true ]; then
+            echo "Rolling update failed. Exiting with error."
+            exit 1
+          fi
         working-directory: ./packer
