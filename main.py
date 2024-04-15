@@ -114,7 +114,7 @@ def unauthorised_verify_user():
     return services.handle_unauthorised_methods()
 
 
-@app.route('/v1/user', methods=[HTTP_METHODS[1]])
+@app.route('/v2/user', methods=[HTTP_METHODS[1]])
 def create_new_user():
 
     if util.check_request_sent_with_payload(request,auth=True,params=True):
@@ -149,13 +149,13 @@ def create_new_user():
     return make_response('',400)
 
 
-@app.route('/v1/user', methods=HTTP_METHODS[2:].append(HTTP_METHODS[0]))
+@app.route('/v2/user', methods=HTTP_METHODS[2:].append(HTTP_METHODS[0]))
 def unauthorised_create_user_request():
     
     return services.handle_unauthorised_methods()
 
 
-@app.route('/v1/user/self', methods=[HTTP_METHODS[0],HTTP_METHODS[2]], provide_automatic_options=False)
+@app.route('/v2/user/self', methods=[HTTP_METHODS[0],HTTP_METHODS[2]], provide_automatic_options=False)
 def get_or_update_user_data():
 
     log_module.log(log_level='INFO',log_message='Received request to get/update user')
@@ -208,7 +208,7 @@ def get_or_update_user_data():
         return make_response('',400)
 
 
-@app.route('/v1/user/self', methods=HTTP_METHODS[1:])
+@app.route('/v2/user/self', methods=HTTP_METHODS[1:])
 def unauthorised_get_user_request():
     
     return services.handle_unauthorised_methods()
