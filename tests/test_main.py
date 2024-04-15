@@ -41,7 +41,7 @@ def test_create_update_get_user(test_client):
     
     print(f"\nCreating User... with the following details {user_data}")
 
-    postResponse = test_client.post('/v1/user', json=user_data)
+    postResponse = test_client.post('/v2/user', json=user_data)
 
     assert postResponse.status_code == 201
 
@@ -62,7 +62,7 @@ def test_create_update_get_user(test_client):
 
     print("\nMaking GET request to verify user details..")
 
-    getResponse = test_client.get('/v1/user/self', headers=headers)
+    getResponse = test_client.get('/v2/user/self', headers=headers)
 
     assert getResponse.status_code == 200
 
@@ -82,7 +82,7 @@ def test_create_update_get_user(test_client):
         "first_name" : "Sam"
     }
 
-    putResponse = test_client.put('/v1/user/self', headers=headers, json=modified_data)
+    putResponse = test_client.put('/v2/user/self', headers=headers, json=modified_data)
 
     assert putResponse.status_code == 204
 
@@ -90,7 +90,7 @@ def test_create_update_get_user(test_client):
     # get user
     print("\nMaking GET request to verify user details..")
 
-    getResponse = test_client.get('/v1/user/self', headers=headers)
+    getResponse = test_client.get('/v2/user/self', headers=headers)
 
     assert getResponse.status_code == 200
 
